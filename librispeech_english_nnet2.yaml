@@ -9,7 +9,7 @@ decoder:
     word-syms : test/models/english/librispeech_nnet_a_online/words.txt
     fst : test/models/english/librispeech_nnet_a_online/HCLG.fst
     mfcc-config : test/models/english/librispeech_nnet_a_online/conf/mfcc.conf
-    ivector-extraction-config : test/models/english/librispeech_nnet_a_online/conf/ivector_extractor.fixed.conf
+    ivector-extraction-config : test/models/english/librispeech_nnet_a_online/conf/ivector_extractor.conf
     max-active: 10000
     beam: 10.0
     lattice-beam: 6.0
