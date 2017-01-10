@@ -67,6 +67,9 @@ all the prerequisites manually, one could use the Dockerfile created by José Ed
   * sudo pip install ws4py==0.3.2
   * gst-inspect-1.0 kaldinnet2onlinedecoder
 
+  * start ./worker.sh   and ./server.sh,  they'll start on ws://localhost:8890 by default
+  * test with:  python kaldigstserver/client.py -r 32000 test/data/english_test.raw
+
 *NB!*: The server doesn't work quite correctly with ws4py 0.3.5 because of a bug I reported here: https://github.com/Lawouach/WebSocket-for-Python/issues/152.
 Use ws4py 0.3.2 instead. To install ws4py 0.3.2 using `pip`, run:
 
