@@ -34,7 +34,7 @@ silence-timeout: 10
 post-processor: perl -npe 'BEGIN {use IO::Handle; STDOUT->autoflush(1);} s/(.*)/\1./;'
 
 # A sample full post processor that add a confidence score to 1-best hyp and deletes other n-best hyps
-full-post-processor: ./sample_full_post_processor.py
+full-post-processor: ./kaldigstserver/full_post_processor.py
 
 logging:
     version : 1
