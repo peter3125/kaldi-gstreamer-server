@@ -54,27 +54,27 @@ class DecoderPipeline2(object):
 
         decoder_config = conf.get("decoder", {})
         if 'nnet-mode' in decoder_config:
-          logger.info("Setting decoder property: %s = %s" % ('nnet-mode', decoder_config['nnet-mode']))
+          #logger.info("Setting decoder property: %s = %s" % ('nnet-mode', decoder_config['nnet-mode']))
           self.asr.set_property('nnet-mode', decoder_config['nnet-mode'])
           del decoder_config['nnet-mode']
 
         for (key, val) in decoder_config.iteritems():
             if key != "use-threaded-decoder":
-                logger.info("Setting decoder property: %s = %s" % (key, val))
+                #logger.info("Setting decoder property: %s = %s" % (key, val))
                 self.asr.set_property(key, val)
 
         self.appsrc.set_property("is-live", True)
         self.filesink.set_property("location", "/dev/null")
-        logger.info('Created GStreamer elements')
+        #logger.info('Created GStreamer elements')
 
         self.pipeline = Gst.Pipeline()
         for element in [self.appsrc, self.decodebin, self.audioconvert, self.audioresample, self.tee,
                         self.queue1, self.filesink,
                         self.queue2, self.asr, self.fakesink]:
-            logger.debug("Adding %s to the pipeline" % element)
+            #logger.debug("Adding %s to the pipeline" % element)
             self.pipeline.add(element)
 
-        logger.info('Linking GStreamer elements')
+        #logger.info('Linking GStreamer elements')
 
         self.appsrc.link(self.decodebin)
         #self.appsrc.link(self.audioconvert)
@@ -103,18 +103,18 @@ class DecoderPipeline2(object):
         self.asr.connect('final-result', self._on_final_result)
         self.asr.connect('full-final-result', self._on_full_final_result)
 
-        logger.info("Setting pipeline to READY")
+        #logger.info("Setting pipeline to READY")
         self.pipeline.set_state(Gst.State.READY)
-        logger.info("Set pipeline to READY")
+        #logger.info("Set pipeline to READY")
 
     def _connect_decoder(self, element, pad):
-        logger.info("%s: Connecting audio decoder" % self.request_id)
+        #logger.info("%s: Connecting audio decoder" % self.request_id)
         pad.link(self.audioconvert.get_static_pad("sink"))
-        logger.info("%s: Connected audio decoder" % self.request_id)
+        #logger.info("%s: Connected audio decoder" % self.request_id)
 
 
     def _on_partial_result(self, asr, hyp):
-        logger.info("%s: Got partial result: %s" % (self.request_id, hyp.decode('utf8')))
+        #logger.info("%s: Got partial result: %s" % (self.request_id, hyp.decode('utf8')))
         if self.result_handler:
             self.result_handler(hyp.decode('utf8'), False)
 
@@ -195,11 +195,11 @@ class DecoderPipeline2(object):
         self.set_adaptation_state("")
 
     def process_data(self, data):
-        logger.debug('%s: Pushing buffer of size %d to pipeline' % (self.request_id, len(data)))
+        #logger.debug('%s: Pushing buffer of size %d to pipeline' % (self.request_id, len(data)))
         buf = Gst.Buffer.new_allocate(None, len(data), None)
         buf.fill(0, data)
         self.appsrc.emit("push-buffer", buf)
-        logger.debug('%s: Pushing buffer done' % self.request_id)
+        #logger.debug('%s: Pushing buffer done' % self.request_id)
 
 
     def end_request(self):
