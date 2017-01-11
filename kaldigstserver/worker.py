@@ -282,7 +282,7 @@ class ServerWebsocket(WebSocketClient):
             return text
 
     def post_process_full(self, full_result):
-        if self.full_post_processor:
+        if self.full_post_processor and self.full_post_processor.stdin:
             self.full_post_processor.stdin.write("%s\n\n" % json.dumps(full_result))
             self.full_post_processor.stdin.flush()
             lines = []
