@@ -61,18 +61,20 @@ all the prerequisites manually, one could use the Dockerfile created by José Ed
   * YAML
   * JSON
 
+make sure you export the GST_PLUGIN_PATH (see worker.sh)
 ```
 export GST_PLUGIN_PATH=/opt/kaldi/gst-plugin
+```
+install the required files for Python 2.7
+```
 sudo apt install -y python-gi
 sudo pip install tornado
 sudo pip install ws4py==0.3.2
 ```
-
-To test its working
+To test the graph system is working
 ```
 gst-inspect-1.0 kaldinnet2onlinedecoder
 ```
-
 To use:
 ```
 ./worker.sh
