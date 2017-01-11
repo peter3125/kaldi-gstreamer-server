@@ -61,14 +61,29 @@ all the prerequisites manually, one could use the Dockerfile created by José Ed
   * YAML
   * JSON
 
-  * export GST_PLUGIN_PATH=/opt/kaldi/gst-plugin
-  * sudo apt install -y python-gi
-  * sudo pip install tornado
-  * sudo pip install ws4py==0.3.2
-  * gst-inspect-1.0 kaldinnet2onlinedecoder
+```
+export GST_PLUGIN_PATH=/opt/kaldi/gst-plugin
+sudo apt install -y python-gi
+sudo pip install tornado
+sudo pip install ws4py==0.3.2
+```
 
-  * start ./worker.sh   and ./server.sh,  they'll start on ws://localhost:8890 by default
-  * test with:  python kaldigstserver/client.py -r 32000 test/data/english_test.raw
+To test its working
+```
+gst-inspect-1.0 kaldinnet2onlinedecoder
+```
+
+To use:
+```
+./worker.sh
+./server.sh,
+```
+they'll start on ws://localhost:8890 by default
+
+test with:
+```
+python kaldigstserver/client.py -r 32000 test/data/english_test.raw
+```
 
 *NB!*:  if you're compiling your own models, the HCLG.fst is located at *exp/tri3b/graph/HCLG.fst*
 
