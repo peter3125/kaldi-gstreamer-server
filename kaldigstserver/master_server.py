@@ -186,20 +186,20 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
         if event["status"] == 0 and ("result" in event):
             try:
                 # !!!
-                obj = {};
+                obj = {}
                 if len(event["result"]["hypotheses"]) > 0 and event["result"]["final"]:
                     obj["utterance"] = event["result"]["hypotheses"][0]["transcript"]
 
-                if ("segment-start" in event):
+                if "segment-start" in event:
                     try:
-                        logging.info("TRY1: %s" % event["segment-start"]);
+                        logging.info("TRY1: %s" % event["segment-start"])
                         obj["segment_start"] = event["segment-start"]
                         obj["segment_length"] = event["segment-length"]
                     except:
                         logging.info("TRY1: failed")
 
                 if ("utterance" in obj):
-                    self.resultList.append(obj);
+                    self.resultList.append(obj)
 
             except:
                 e = sys.exc_info()[0]
@@ -210,7 +210,7 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
 
     def close(self):
         logging.info("%s: Receiving 'close' from worker" % (self.id))
-        self.final_result_queue.put(self.resultList);
+        self.final_result_queue.put(self.resultList)
 
 
 class ReferenceHandler(tornado.web.RequestHandler):

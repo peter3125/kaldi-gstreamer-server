@@ -22,7 +22,7 @@ def post_process_json(str):
                 confidence = likelihood1 - likelihood2
                 confidence = 1 - exp(-confidence)
             else:
-                confidence = 1.0e+10;
+                confidence = 1.0e+10
             event["result"]["hypotheses"][0]["confidence"] = confidence
 
             event["result"]["hypotheses"][0]["transcript"] += "."
