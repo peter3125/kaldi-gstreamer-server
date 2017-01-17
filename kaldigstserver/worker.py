@@ -352,7 +352,7 @@ def main():
     while True:
         ws = ServerWebsocket(args.uri, decoder_pipeline, post_processor, full_post_processor=full_post_processor)
         try:
-            logger.info("Opening websocket connection to master server")
+            logger.info("Opening websocket connection to master server @ " + args.uri)
             ws.connect()
             ws.run_forever()
         except Exception:

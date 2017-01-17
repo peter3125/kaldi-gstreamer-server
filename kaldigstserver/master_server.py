@@ -352,9 +352,10 @@ def main():
           "certfile": options.certfile,
           "keyfile": options.keyfile,
         }
-        logging.info("Using SSL for serving requests")
+        logging.info("Using SSL for serving requests on port " + str(options.port))
         app.listen(options.port, ssl_options=ssl_options)
     else:
+        logging.info("Non-SSL serving requests on port " + str(options.port))
         app.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 
