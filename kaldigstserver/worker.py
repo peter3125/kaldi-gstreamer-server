@@ -2,7 +2,6 @@ __author__ = 'tanel'
 
 import logging
 import logging.config
-import time
 import thread
 import argparse
 from subprocess import Popen, PIPE
@@ -10,8 +9,6 @@ from gi.repository import GObject
 import yaml
 import json
 import sys
-import locale
-import codecs
 import zlib
 import base64
 import time
@@ -28,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 CONNECT_TIMEOUT = 5
 SILENCE_TIMEOUT = 5
-USE_NNET2 = False
+USE_NNET2 = True  # our default
 
 class ServerWebsocket(WebSocketClient):
     STATE_CREATED = 0
@@ -117,7 +114,7 @@ class ServerWebsocket(WebSocketClient):
                             logger.info("%s: Setting adaptation state to user-provided value" % (self.request_id))
                             self.decoder_pipeline.set_adaptation_state(adaptation_state)
                         else:
-                            logger.warning("%s: Cannot handle adaptation state type " % (self.request_id, as_props.get('type', "")))
+                            logger.warning("%s: Cannot handle adaptation state type %s" % (self.request_id, as_props.get('type', "")))
                     else:
                         logger.warning("%s: Got JSON message but don't know what to do with it" % (self.request_id))
             else:
@@ -159,6 +156,11 @@ class ServerWebsocket(WebSocketClient):
         self.finish_request()
         logger.debug("%s: Websocket closed() finished" % self.request_id)
 
+
+    # callback from the GST pipeline with a partial result
+    # PyCharm doesn't seem to be able to debug any of these - as it crashes when it hits the breakpoint
+    # result: the RAW text
+    # final: boolean true if last message
     def _on_result(self, result, final):
         if final:
             # final results are handled by _on_full_result()
@@ -170,20 +172,21 @@ class ServerWebsocket(WebSocketClient):
         logger.info("%s: Postprocessing (final=%s) result.."  % (self.request_id, final))
         if final:
             logger.info("%s: Before postprocessing: %s" % (self.request_id, result))
-        processed_transcript = self.post_process(result)
+        processed_transcript = self.post_process(result)  # cleanup the string
         logger.info("%s: Postprocessing done." % self.request_id)
-        if final:
-            logger.info("%s: After postprocessing: %s" % (self.request_id, processed_transcript))
-
         event = dict(status=common.STATUS_SUCCESS,
                      segment=self.num_segments,
                      result=dict(hypotheses=[dict(transcript=processed_transcript)], final=final))
+        # send interim result
         try:
             self.send(json.dumps(event))
         except:
             e = sys.exc_info()[1]
             logger.warning("Failed to send event to master: %s" % e)
 
+
+    # callback from the GST pipeline with a FINAL result
+    # full_result_json a pipeline json message with timing info and info
     def _on_full_result(self, full_result_json):
         self.last_decoder_message = time.time()
         full_result = json.loads(full_result_json)
@@ -210,6 +213,8 @@ class ServerWebsocket(WebSocketClient):
                 e = sys.exc_info()[1]
                 logger.warning("Failed to send event to master: %s" % e)
 
+
+    # only used when NNET2 isn't used
     def _on_word(self, word):
         self.last_decoder_message = time.time()
         if word != "<#s>":
@@ -337,7 +342,7 @@ def main():
         full_post_processor = Popen(conf["full-post-processor"], shell=True, stdin=PIPE, stdout=PIPE)
 
     global USE_NNET2
-    USE_NNET2 = conf.get("use-nnet2", False)
+    USE_NNET2 = conf.get("use-nnet2", True)  # our default
 
     global SILENCE_TIMEOUT
     SILENCE_TIMEOUT = conf.get("silence-timeout", 5)

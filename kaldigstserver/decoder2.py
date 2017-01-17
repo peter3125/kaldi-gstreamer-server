@@ -20,7 +20,8 @@ logger = logging.getLogger(__name__)
 import pdb
 
 class DecoderPipeline2(object):
-    def __init__(self, conf={}):
+    def __init__(self, conf=None):
+        if conf is None:  conf = {}
         logger.info("Creating decoder using conf: %s" % conf)
         self.create_pipeline(conf)
         self.outdir = conf.get("out-dir", None)
@@ -120,6 +121,7 @@ class DecoderPipeline2(object):
         #logger.info("%s: Connected audio decoder" % self.request_id)
 
 
+    # partial results are text only - no timing  :(
     def _on_partial_result(self, asr, hyp):
         #logger.info("%s: Got partial result: %s" % (self.request_id, hyp.decode('utf8')))
         if self.result_handler:
@@ -130,6 +132,7 @@ class DecoderPipeline2(object):
         if self.result_handler:
             self.result_handler(hyp.decode('utf8'), True)
 
+    # these pretty much just pump the RAW jason from the ASR to the listening module
     def _on_full_final_result(self, asr, result_json):
         logger.info("%s: Got full final result: %s" % (self.request_id, result_json.decode('utf8')))
         if self.full_result_handler:

@@ -42,7 +42,7 @@ class Application(tornado.web.Application):
             (r"/client/ws/speech", DecoderSocketHandler),
             (r"/client/ws/status", StatusSocketHandler),
             (r"/client/dynamic/reference", ReferenceHandler),
-            (r"/client/dynamic/recognize", HttpChunkedRecognizeHandler),
+            (r"/client/dynamic/recognize", HttpChunkedRecognizeHandler),  # booktrack service interface
             (r"/worker/ws/speech", WorkerSocketHandler),
             (r"/client/static/(.*)", tornado.web.StaticFileHandler, {'path': settings["static_path"]}),
         ]
@@ -105,6 +105,9 @@ def content_type_to_caps(content_type):
         return content_type
 
 
+#
+# this is the interface we talk to at booktrack
+#
 @tornado.web.stream_request_body
 class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
     """
@@ -178,6 +181,8 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
         self.finish()
         logging.info("Everything done")
 
+
+    # this sends the event including timing back to the requesting client
     def send_event(self, event):
         event_str = str(event)
         if len(event_str) > 100:
@@ -190,13 +195,11 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
                 if len(event["result"]["hypotheses"]) > 0 and event["result"]["final"]:
                     obj["utterance"] = event["result"]["hypotheses"][0]["transcript"]
 
+                # add start and length if they're there
                 if "segment-start" in event:
-                    try:
-                        logging.info("TRY1: %s" % event["segment-start"])
-                        obj["segment_start"] = event["segment-start"]
-                        obj["segment_length"] = event["segment-length"]
-                    except:
-                        logging.info("TRY1: failed")
+                    obj["segment_start"] = event["segment-start"]
+                if "segment-length" in event:
+                    obj["segment_length"] = event["segment-length"]
 
                 if ("utterance" in obj):
                     self.resultList.append(obj)
