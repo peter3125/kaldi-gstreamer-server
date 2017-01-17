@@ -22,6 +22,7 @@ from decoder2 import DecoderPipeline2
 import common
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
 CONNECT_TIMEOUT = 5
 SILENCE_TIMEOUT = 5

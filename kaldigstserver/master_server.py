@@ -187,7 +187,7 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
         event_str = str(event)
         if len(event_str) > 100:
             event_str = event_str[:97] + "..."
-        logging.info("%s: Receiving event %s from worker" % (self.id, event_str))
+        logging.debug("%s: Receiving event %s from worker" % (self.id, event_str))
         if event["status"] == 0 and ("result" in event):
             try:
                 # !!!
@@ -268,7 +268,7 @@ class WorkerSocketHandler(tornado.websocket.WebSocketHandler):
         self.application.send_status_update()
 
     def on_close(self):
-        logging.info("Worker " + self.__str__() + " leaving")
+        logging.debug("Worker " + self.__str__() + " leaving")
         self.application.available_workers.discard(self)
         if self.client_socket:
             self.client_socket.close()
@@ -293,13 +293,13 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
         event_str = str(event)
         if len(event_str) > 100:
             event_str = event_str[:97] + "..."
-        logging.info("%s: Sending event %s to client" % (self.id, event_str))
+        logging.debug("%s: Sending event %s to client" % (self.id, event_str))
         self.write_message(json.dumps(event))
 
     def open(self):
         self.id = str(uuid.uuid4())
-        logging.info("%s: OPEN" % (self.id))
-        logging.info("%s: Request arguments: %s" % (self.id, " ".join(["%s=\"%s\"" % (a, self.get_argument(a)) for a in self.request.arguments])))
+        logging.info("%s: OPEN for ASR" % (self.id))
+        logging.debug("%s: Request arguments: %s" % (self.id, " ".join(["%s=\"%s\"" % (a, self.get_argument(a)) for a in self.request.arguments])))
         self.user_id = self.get_argument("user-id", "none", True)
         self.content_id = self.get_argument("content-id", "none", True)
         self.worker = None
@@ -321,7 +321,7 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
             self.close()
 
     def on_connection_close(self):
-        logging.info("%s: Handling on_connection_close()" % self.id)
+        logging.debug("%s: Handling on_connection_close()" % self.id)
         self.application.num_requests_processed += 1
         self.application.send_status_update()
         if self.worker:
@@ -334,7 +334,7 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         assert self.worker is not None
-        logging.info("%s: Forwarding client message (%s) of length %d to worker" % (self.id, type(message), len(message)))
+        logging.debug("%s: Forwarding client message (%s) of length %d to worker" % (self.id, type(message), len(message)))
         if isinstance(message, unicode):
             self.worker.write_message(message, binary=False)
         else:
@@ -342,7 +342,7 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG, format="%(levelname)8s %(asctime)s %(message)s ")
+    logging.basicConfig(level=logging.ERROR, format="%(levelname)8s %(asctime)s %(message)s ")
     logging.debug('Starting up server')
     from tornado.options import define, options
     define("certfile", default="", help="certificate file for secured SSL connection")

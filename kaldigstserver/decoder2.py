@@ -128,13 +128,13 @@ class DecoderPipeline2(object):
             self.result_handler(hyp.decode('utf8'), False)
 
     def _on_final_result(self, asr, hyp):
-        logger.info("%s: Got final result: %s" % (self.request_id, hyp.decode('utf8')))
+        #logger.info("%s: Got final result: %s" % (self.request_id, hyp.decode('utf8')))
         if self.result_handler:
             self.result_handler(hyp.decode('utf8'), True)
 
     # these pretty much just pump the RAW jason from the ASR to the listening module
     def _on_full_final_result(self, asr, result_json):
-        logger.info("%s: Got full final result: %s" % (self.request_id, result_json.decode('utf8')))
+        #logger.info("%s: Got full final result: %s" % (self.request_id, result_json.decode('utf8')))
         if self.full_result_handler:
             self.full_result_handler(result_json)
 
