@@ -6,6 +6,7 @@ Created on May 17, 2013
 import gi
 
 gi.require_version('Gst', '1.0')
+# install: sudo apt install -y python-gi (or python3-gi)
 from gi.repository import GObject, Gst
 
 GObject.threads_init()
@@ -47,6 +48,12 @@ class DecoderPipeline2(object):
         self.queue2 = Gst.ElementFactory.make("queue", "queue2")
         self.asr = Gst.ElementFactory.make("kaldinnet2onlinedecoder", "asr")
         self.fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
+
+        # check GST plugin
+        if self.asr is None:
+            raise ValueError("error, cannot create Kaldi ASR, check GST plugin is installed "
+                             "(and export GST_PLUGIN_PATH=/opt/kaldi/gst-plugin, then "
+                             "check gst-inspect-1.0 kaldinnet2onlinedecoder)")
 
         # This needs to be set first
         if "use-threaded-decoder" in conf["decoder"]:
